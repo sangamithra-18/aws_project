@@ -8,3 +8,8 @@ def home():
 @app.get("/health")
 def health():
     return {"status": "healthy"}    
+
+
+@app.get("/home")
+def home():
+    return {"message": "CI/CD TEST"}
