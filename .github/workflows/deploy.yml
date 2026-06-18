@@ -1,17 +1,15 @@
-name: Test Secret
+name: Test SSH Key
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Secret Exists
+      - name: Show key header
         run: |
-          echo "Length: ${#KEY}"
+          echo "$KEY" | head -n 3
         env:
           KEY: ${{ secrets.EC2_SSH_KEY }}
