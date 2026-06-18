@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Test Secret
 
 on:
   push:
@@ -6,21 +6,12 @@ on:
       - main
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ~/aws_project
-            git pull origin main
-            sudo docker compose down
-            sudo docker compose up -d --build
+      - name: Check Secret Exists
+        run: |
+          echo "Length: ${#KEY}"
+        env:
+          KEY: ${{ secrets.EC2_SSH_KEY }}
