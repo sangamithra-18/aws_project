@@ -1,38 +1,37 @@
 name: Deploy to EC2
 
 on:
-push:
-branches:
-- main
+  push:
+    branches:
+      - main
 
 jobs:
-deploy:
-runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-steps:
-  - uses: actions/checkout@v4
+      - name: Create SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2.pem
+          chmod 600 ~/.ssh/ec2.pem
 
-  - name: Create SSH Key
-    run: |
-      mkdir -p ~/.ssh
-      echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2.pem
-      chmod 600 ~/.ssh/ec2.pem
+      - name: Test Connection
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+          -i ~/.ssh/ec2.pem \
+          ubuntu@${{ secrets.EC2_HOST }} "echo CONNECTED"
 
-  - name: Test Connection
-    run: |
-      ssh -o StrictHostKeyChecking=no \
-      -i ~/.ssh/ec2.pem \
-      ubuntu@${{ secrets.EC2_HOST }} "echo CONNECTED"
-
-  - name: Deploy
-    run: |
-      ssh -o StrictHostKeyChecking=no \
-      -i ~/.ssh/ec2.pem \
-      ubuntu@${{ secrets.EC2_HOST }} '
-        cd ~/aws_project
-        git pull origin main
-        sudo docker compose down
-        sudo docker compose up -d --build
-      '
-
+      - name: Deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+          -i ~/.ssh/ec2.pem \
+          ubuntu@${{ secrets.EC2_HOST }} '
+            cd ~/aws_project
+            git pull origin main
+            sudo docker compose down
+            sudo docker compose up -d --build
+          '
